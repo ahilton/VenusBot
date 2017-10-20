@@ -214,15 +214,20 @@ const promptForChoice = (session, order, text, choices, listStyle) => {
 
 const logOrderState = (session, order, message, choices) => {
 
-    var conversationId, channel, lastUserMessage, lastOrderState, lastSystemMessage
+    var conversationId, channel, lastUserMessage, lastOrderState, lastSystemMessage, userName, userId, timestamp
     if (session.message && session.message.address && session.message.address.conversation){
         //console.log('Conversationid:')
         conversationId = session.message.address.conversation.id
         channel = session.message.address.channelId
+        timestamp = session.message.timestamp
     }
     if (session.message && session.message.type === 'message'){
         //console.log('User message:')
         lastUserMessage = session.message.text
+    }
+    if (session.message && session.message.user){
+        userId = session.message.user.id
+        userName = session.message.user.name
     }
     if (order){
         //console.log('Order:')
@@ -239,7 +244,10 @@ const logOrderState = (session, order, message, choices) => {
         lastUserMessage:lastUserMessage,
         lastOrderState:lastOrderState,
         lastSystemMessage:lastSystemMessage,
-        choices:choices?choices:[]
+        choices:choices?choices:[],
+        userId:userId,
+        userName:userName,
+        timestamp:timestamp
     }
     console.log(data)
     performOrderStateLogging(data)
@@ -278,43 +286,3 @@ function getStockListFromLuisConfig() {
     const stockList = luis.closedLists.filter(list=>list.name === 'Stocks')[0]
     return stockList.subLists.map(element=>element.canonicalForm)
 }
-
-// const logUserConversation = (event) => {
-//     //console.log(event)
-//     var logUrl=botLoggerHostName+'/conversation/log?conversationId='+event.address.conversation.id
-//     //console.log(logUrl)
-//     var requestData = {
-//         url: logUrl,
-//         json: true
-//     };
-// };
-//
-// const logUserSession = (session) => {
-//     //console.log(session)
-//     if (session.sessionState && session.sessionState.callstack){
-//         console.log("------*********")
-//         var {callstack} = session.sessionState
-//         console.log()
-//         for (var i=0; i<callstack.length; i++){
-//             if (callstack[i].id==='*:Order' && callstack[i].state.order) {
-//                 console.log(callstack[i].state.order)
-//             }
-//         }
-//         console.log("------*********;;;;;;;")
-//     }
-// }
-
-// Middleware for logging
-// bot.use({
-//     receive: function (event, next) {
-//         logUserConversation(event);
-//         next();
-//     },
-//     send: function (event, next) {
-//         logUserConversation(event);
-//         next();
-//     },
-//     botbuilder: function (session, next) {
-//         next();
-//     }
-// });
