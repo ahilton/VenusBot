@@ -279,11 +279,8 @@ const logOrderState = (session, order, message, choices) => {
         userName = session.message.user.name
     }
     if (order){
-        //console.log('Order:')
-        lastOrderState = {
-            ...order,
-            timestamp:timestamp
-        }
+        lastOrderState = order
+        lastOrderState.timestamp=timestamp
     }
     if (message){
         //console.log('System message:')
