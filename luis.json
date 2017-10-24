@@ -1,7 +1,7 @@
 {
   "luis_schema_version": "2.1.0",
-  "versionId": "0.1",
-  "name": "Venus",
+  "versionId": "0.2",
+  "name": "OMSVenus",
   "desc": "",
   "culture": "en-us",
   "intents": [
@@ -24,6 +24,9 @@
     },
     {
       "name": "Order"
+    },
+    {
+      "name": "OrderQuery"
     }
   ],
   "entities": [
@@ -61,9 +64,9 @@
       "name": "Order",
       "children": [
         "Stocks",
+        "number",
         "OrderDirection",
-        "OrderType",
-        "number"
+        "OrderType"
       ]
     }
   ],
@@ -103,9 +106,27 @@
     "number"
   ],
   "actions": [],
-  "model_features": [],
+  "model_features": [
+    {
+      "name": "DirectionBuy",
+      "mode": true,
+      "words": "Buy,Long,purchase,obtain,get,add",
+      "activated": true
+    },
+    {
+      "name": "DirectionSell",
+      "mode": true,
+      "words": "Sell,Short,loose,cut",
+      "activated": true
+    }
+  ],
   "regex_features": [],
   "utterances": [
+    {
+      "text": "what do i have?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
     {
       "text": "yes",
       "intent": "Communication.Confirm",
@@ -128,6 +149,22 @@
       ]
     },
     {
+      "text": "ibm",
+      "intent": "Order",
+      "entities": []
+    },
+    {
+      "text": "sell",
+      "intent": "Order",
+      "entities": [
+        {
+          "entity": "OrderDirection",
+          "startPos": 0,
+          "endPos": 3
+        }
+      ]
+    },
+    {
       "text": "i would like to place an order",
       "intent": "Order",
       "entities": [
@@ -137,6 +174,11 @@
           "endPos": 29
         }
       ]
+    },
+    {
+      "text": "what is my order?",
+      "intent": "OrderQuery",
+      "entities": []
     },
     {
       "text": "i need to place an order",
@@ -150,8 +192,18 @@
       ]
     },
     {
+      "text": "what are my orders",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
       "text": "perfect thank you",
       "intent": "Communication.Confirm",
+      "entities": []
+    },
+    {
+      "text": "what orders do i have",
+      "intent": "OrderQuery",
       "entities": []
     },
     {
@@ -176,8 +228,13 @@
       ]
     },
     {
-      "text": "No doubt Okay",
-      "intent": "Communication.Confirm",
+      "text": "what are my orders?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "restart now",
+      "intent": "Communication.StartOver",
       "entities": []
     },
     {
@@ -201,28 +258,18 @@
       "entities": []
     },
     {
-      "text": "Restart now",
-      "intent": "Communication.StartOver",
-      "entities": []
-    },
-    {
-      "text": "how do i change the phone number for Jack ?",
-      "intent": "None",
-      "entities": []
-    },
-    {
       "text": "mark all email messages as read",
       "intent": "None",
       "entities": []
     },
     {
-      "text": "\" yes please , send it  \"",
-      "intent": "Communication.Confirm",
+      "text": "how do i change the phone number for jack ?",
+      "intent": "None",
       "entities": []
     },
     {
-      "text": "\" Please , restart now  \"",
-      "intent": "Communication.StartOver",
+      "text": "no doubt okay",
+      "intent": "Communication.Confirm",
       "entities": []
     },
     {
@@ -236,7 +283,12 @@
       "entities": []
     },
     {
-      "text": "Take me to tennessee",
+      "text": "start speaker . cancel",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "take me to tennessee",
       "intent": "None",
       "entities": [
         {
@@ -247,8 +299,13 @@
       ]
     },
     {
-      "text": "start speaker . cancel",
-      "intent": "None",
+      "text": "\" yes please , send it \"",
+      "intent": "Communication.Confirm",
+      "entities": []
+    },
+    {
+      "text": "\" please , restart now \"",
+      "intent": "Communication.StartOver",
       "entities": []
     },
     {
@@ -362,6 +419,76 @@
           "endPos": 22
         }
       ]
+    },
+    {
+      "text": "what are my ibm orders?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "what are my holdings",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "what are my stocks",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "what have i got in ibm",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "what are my apple holdings?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "how many ibm do i have?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "what have i got in ibm?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "tell my what ibm i have?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "tell me what i have?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "how many ibm shares?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "how many ibm?",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "show me my apple",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "show me my ibm shares",
+      "intent": "OrderQuery",
+      "entities": []
+    },
+    {
+      "text": "show me my apple holdings",
+      "intent": "OrderQuery",
+      "entities": []
     }
   ]
 }
