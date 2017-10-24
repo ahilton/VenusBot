@@ -43,7 +43,7 @@ var luisAppId = process.env.LuisAppId;
 var luisAPIKey = process.env.LuisAPIKey;
 var luisAPIHostName = process.env.LuisAPIHostName || 'westus.api.cognitive.microsoft.com';
 
-const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisAppId + '?subscription-key=' + luisAPIKey + '&staging=true&verbose=true&timezoneOffset=0&q=';
+const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisAppId + '?subscription-key=' + luisAPIKey + '&verbose=true&timezoneOffset=0&q=';
 
 console.log(LuisModelUrl)
 
@@ -129,7 +129,7 @@ bot.dialog('Order', [
 
         if (!order.stock) {
             // Example response: { index: 0, entity: 'Apple', score: 0.8 }
-            const bestMatch = builder.EntityRecognizer.findBestMatch(getStockListFromLuisConfig(), results.response, 0.7)
+            const bestMatch = builder.EntityRecognizer.findBestMatch(getStockListFromLuisConfig(), results.response, 0.6)
             console.log(bestMatch)
             if (bestMatch){
                 order.stock = bestMatch.entity
@@ -185,9 +185,9 @@ bot.dialog('Order', [
         }
         var price = getSharePrice(order.stock).toFixed(2)
         order.price = price
-        var totalcost = (price * order.qty).toFixed(2)
+        var totalcost = (price * order.qty)
         console.log(order)
-        promptForConfirmation(session, order, 'Confirm you would like to place a '+order.direction+' order for '+order.qty+' of '+order.stock+' at AUD $'+order.price+'? The total value is $'+totalcost);
+        promptForConfirmation(session, order, 'Confirm you would like to place a '+order.direction+' order for '+niceNumber(order.qty)+' of '+order.stock+' at $'+order.price+' AUD? The total cost is $'+niceNumber(totalcost));
     },
     /*
         --4-- Confirmation?
@@ -195,9 +195,9 @@ bot.dialog('Order', [
     function (session, results) {
         var {dialogData} = session
         var {order} = dialogData
-        var totalcost = (order.price * order.qty).toFixed(2)
+        var totalcost = (order.price * order.qty)
         order.completed=results.response
-        promptForText(session, order, order.completed?'OK, order completed! Total value is AUD $'+totalcost+' at an average price of $'+order.price+' per share.':'Order cancelled.')
+        promptForText(session, order, order.completed?'OK, order completed for a total value of $'+niceNumber(totalcost)+' AUD at an average price of $'+order.price+' per share.':'Order cancelled.')
         session.endDialog()
     }
 ]).triggerAction({
@@ -310,17 +310,14 @@ const performOrderStateLogging = (data) => {
         body: data,
         json: true
     };
-    //request.get(requestData, function (error, response, body) {});
     request.put(requestData, function (error, response, body) {})
 };
 
 function getHoldings(address)  {
     var getHoldingsUrl=botLoggerHostName+'/holdings'
-    var body = null
     console.log('Getting Holdings: '+getHoldingsUrl)
     var requestData = {
         url: getHoldingsUrl,
-        body: null,
         json: true
     };
     request.get(requestData, function (error, response, body) {
@@ -329,9 +326,9 @@ function getHoldings(address)  {
             var text
             var stocks = Object.keys(body);
             if(!stocks || stocks.length === 0){
-                text = "Ok you ahve not placed any orders yet.  Say Orders to get started."
+                text = "Ok you have not placed any orders yet. Say Orders to get started."
             } else {
-                text = "Ok, you have "+stocks.map((stock)=>''+body[stock]+' shares of '+stock+'')
+                text = "Ok, you have"+stocks.map((stock)=>' '+body[stock]+' shares of '+stock+'')
             }
 
             var msg = new builder.Message().address(address)
@@ -345,76 +342,29 @@ function getHoldings(address)  {
     //request.put(requestData, function (error, response, body) {})
 };
 
-/*
-function getHoldingForStock(address, stockname)  {
+function getHoldingForStock(address, stock)  {
     var getHoldingForStockUrl=botLoggerHostName+'/stock/holding'
-    var body = null
     console.log('Getting Holdings: '+getHoldingForStockUrl)
     var requestData = {
         url: getHoldingForStockUrl,
-        body: stockname,
+        qs: {stock:stock},
         json: true
     };
 
     request.get(requestData, function (error, response, body) {
         console.log(body)
-        var text
-
-        if (error){
-         return
-        }else if(!stockname || stockname.length === 0){
-            text = "Ok you have asked about an invalid stock!"
-        } else {
-            if (body===0){
-                text = "Ok, you have no shares of "+stockname+"!"
-            } else if (body){
-                var values = Object.keys(body);
-                text = "Ok, you have "+body.toString()+' shares of '+stockname+''
-            } else{
-                return
-            }
-        }
-
-        var msg = new builder.Message().address(address)
-        msg.text(text)
-        msg.textLocale('en-US')
-        bot.send(msg)
-    })
-
-
-};*/
-
-function getHoldingForStock(address, stockname)  {
-    var getHoldingForStockUrl=botLoggerHostName+'/stock/holding'
-    var body = null
-    console.log('Getting Holdings: '+getHoldingForStockUrl)
-    var requestData = {
-        url: getHoldingForStockUrl,
-        body: stockname,
-        json: true
-    };
-
-    request.get(requestData, function (error, response, body) {
-        console.log(body)
-        var text
-
         if (body && !error){
-            var values = Object.keys(body);
-            if( values.length==0){
-                text = "Ok, you have no shares of "+stockname+"!"
+            var msg = new builder.Message().address(address)
+            if(body && body.qty){
+                var avgPrice = body.avgPrice;
+                msg.text("Ok, you have "+body.qty+' shares of '+stock+' at an average price of $'+(avgPrice * 1).toFixed(2))
             } else {
-                var avgPrice = body["avgPrice"];
-                var totalPrice = body["totalPrice"];
-                text = "Ok, you have "+body["qty"]+' shares of '+stockname+' at an average price of $'+(avgPrice * 1).toFixed(2)+'. Total values for this Holding is AUD $'+(totalPrice *  1).toFixed(2)+"."
+                msg.text("Ok, you have no shares of "+stock+"!")
             }
+            msg.textLocale('en-US')
+            bot.send(msg)
         }
-
-        var msg = new builder.Message().address(address)
-        msg.text(text)
-        msg.textLocale('en-US')
-        bot.send(msg)
     })
-
 
 };
 
@@ -472,4 +422,12 @@ function getSharePrice(stock) {
 
 function getRandomPrice(min, max) {
     return Math.random() * (max - min) + min;
+}
+
+function niceNumber(num){
+    return num.toLocaleString(undefined);
+}
+
+function niceDecimal(num){
+    return num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
