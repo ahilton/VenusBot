@@ -280,7 +280,10 @@ const logOrderState = (session, order, message, choices) => {
     }
     if (order){
         //console.log('Order:')
-        lastOrderState = order
+        lastOrderState = {
+            ...order,
+            timestamp:timestamp
+        }
     }
     if (message){
         //console.log('System message:')
