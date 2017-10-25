@@ -197,7 +197,7 @@ bot.dialog('Order', [
         var {order} = dialogData
         var totalcost = (order.price * order.qty)
         order.completed=results.response
-        promptForText(session, order, order.completed?'OK, order completed for a total value of $'+niceNumber(totalcost)+' AUD at an average price of $'+order.price+' per share.':'Order cancelled.')
+        promptForText(session, order, order.completed?'OK, order completed for a total value of $'+niceNumber(totalcost)+' AUD.':'Order cancelled.')
         session.endDialog()
     }
 ]).triggerAction({
