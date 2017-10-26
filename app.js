@@ -36,12 +36,13 @@ var bot = new builder.UniversalBot(connector, function (session) {
     session.send('Sorry, the OMS autobot didn\'t understand \'%s\'. Type \'order\' if you would like to place an order.', session.message.text);
 });
 
-var botLoggerHostName =  process.env.BotLogHostName; //'http://localhost:8080'
+var botLoggerHostName =  process.env.BotLogHostName;
+// var botLoggerHostName =  'http://localhost:8080'
 
 // Make sure you add code to validate these fields
 var luisAppId = process.env.LuisAppId;
 var luisAPIKey = process.env.LuisAPIKey;
-var luisAPIHostName = process.env.LuisAPIHostName || 'westus.api.cognitive.microsoft.com';
+var luisAPIHostName = process.env.LuisAPIHostName || 'southeastasia.api.cognitive.microsoft.com';
 
 const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisAppId + '?subscription-key=' + luisAPIKey + '&verbose=true&timezoneOffset=0&q=';
 
@@ -335,7 +336,7 @@ function getHoldings(address, session)  {
             msg.text(text)
             msg.textLocale('en-US')
             bot.send(msg)
-            logOrderState(session, {}, msg)
+            logOrderState(session, {}, text)
         }
     })
 
@@ -356,15 +357,17 @@ function getHoldingForStock(address, session, stock)  {
         console.log(body)
         if (body && !error){
             var msg = new builder.Message().address(address)
+            var text
             if(body && body.qty){
                 var avgPrice = body.avgPrice;
-                msg.text("Ok, you have "+body.qty+' shares of '+stock+' at an average price of $'+(avgPrice * 1).toFixed(2))
+                text = "Ok, you have "+body.qty+' shares of '+stock+' at an average price of $'+(avgPrice * 1).toFixed(2)
             } else {
-                msg.text("Ok, you have no shares of "+stock+"!")
+                text = "Ok, you have no shares of "+stock+"!"
             }
+            msg.text(text)
             msg.textLocale('en-US')
             bot.send(msg)
-            logOrderState(session, {stock:stock}, msg)
+            logOrderState(session, {stock:stock}, text)
         }
     })
 
