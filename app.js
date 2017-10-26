@@ -59,9 +59,9 @@ bot.dialog('OrderQuery', [
 
         if (stock && stock.resolution){
             console.log(stock.entity)
-            getHoldingForStock(session.message.address,stock.entity.toString())
+            getHoldingForStock(session.message.address, session, stock.entity.toString())
         } else {
-            getHoldings(session.message.address)
+            getHoldings(session.message.address, session)
 
         }
         session.endDialog()
@@ -313,7 +313,7 @@ const performOrderStateLogging = (data) => {
     request.put(requestData, function (error, response, body) {})
 };
 
-function getHoldings(address)  {
+function getHoldings(address, session)  {
     var getHoldingsUrl=botLoggerHostName+'/holdings'
     console.log('Getting Holdings: '+getHoldingsUrl)
     var requestData = {
@@ -326,7 +326,7 @@ function getHoldings(address)  {
             var text
             var stocks = Object.keys(body);
             if(!stocks || stocks.length === 0){
-                text = "Ok you have not placed any orders yet. Say Orders to get started."
+                text = "Ok, you have not placed any orders yet. Say Orders to get started."
             } else {
                 text = "Ok, you have"+stocks.map((stock)=>' '+body[stock]+' shares of '+stock+'')
             }
@@ -335,6 +335,7 @@ function getHoldings(address)  {
             msg.text(text)
             msg.textLocale('en-US')
             bot.send(msg)
+            logOrderState(session, {}, msg)
         }
     })
 
@@ -342,7 +343,7 @@ function getHoldings(address)  {
     //request.put(requestData, function (error, response, body) {})
 };
 
-function getHoldingForStock(address, stock)  {
+function getHoldingForStock(address, session, stock)  {
     var getHoldingForStockUrl=botLoggerHostName+'/stock/holding'
     console.log('Getting Holdings: '+getHoldingForStockUrl)
     var requestData = {
@@ -363,6 +364,7 @@ function getHoldingForStock(address, stock)  {
             }
             msg.textLocale('en-US')
             bot.send(msg)
+            logOrderState(session, {stock:stock}, msg)
         }
     })
 
